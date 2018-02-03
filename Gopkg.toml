@@ -1,0 +1,23 @@
+# Gopkg.toml example
+#
+# Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
+# for detailed Gopkg.toml documentation.
+#
+# required = ["github.com/user/thing/cmd/thing"]
+# ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
+#
+[[constraint]]
+  name = "github.com/wcharczuk/go-chart"
+  version = "v2.0.0-rc.3"
+
+[[constraint]]
+  name = "github.com/buaazp/fasthttprouter"
+  version = "0.1.1"
+
+[[constraint]]
+  name = "github.com/valyala/fasthttp"
+  version = "20160617.0.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/bojand/go-npmdl"
