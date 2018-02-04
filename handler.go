@@ -14,10 +14,8 @@ import (
 const layout = "2006-01-02"
 const ratio float64 = 3.2
 
-// DrawNPMChart is the handler for the request
-func DrawNPMChart(ctx *fasthttp.RequestCtx) {
-	name := strings.ToLower(ctx.UserValue("name").(string))
-
+// GetChartDimensions gets the chart dimentions based on the w query param
+func GetChartDimensions(ctx *fasthttp.RequestCtx) (w int, h int, e error) {
 	width := 800
 	height := 250
 
@@ -25,8 +23,7 @@ func DrawNPMChart(ctx *fasthttp.RequestCtx) {
 		wStr := string(ctx.QueryArgs().Peek("w"))
 		w, err := strconv.Atoi(wStr)
 		if err != nil {
-			ctx.Error(fasthttp.StatusMessage(fasthttp.StatusBadRequest), fasthttp.StatusBadRequest)
-			return
+			return 0, 0, err
 		}
 
 		if w > 0 {
@@ -35,9 +32,22 @@ func DrawNPMChart(ctx *fasthttp.RequestCtx) {
 		}
 	}
 
+	return width, height, nil
+}
+
+// DrawNPMChart is the handler for the request
+func DrawNPMChart(ctx *fasthttp.RequestCtx) {
+	name := strings.ToLower(ctx.UserValue("name").(string))
+
 	rangeParam := "last-year"
 	if ctx.QueryArgs().Has("range") {
 		rangeParam = strings.ToLower(string(ctx.QueryArgs().Peek("range")))
+	}
+
+	width, height, err := GetChartDimensions(ctx)
+	if err != nil {
+		ctx.Error(fasthttp.StatusMessage(fasthttp.StatusBadRequest), fasthttp.StatusBadRequest)
+		return
 	}
 
 	fmt.Printf("name: %s range: %s\n", name, rangeParam)
@@ -59,12 +69,12 @@ func DrawNPMChart(ctx *fasthttp.RequestCtx) {
 		yValues[i] = float64(dl.Downloads)
 	}
 
+	graph := CreateNPMChart(name, xValues, yValues, width, height)
+
 	ctx.Response.Header.Add("content-type", "image/svg+xml;charset=utf-8")
 	ctx.Response.Header.Add("cache-control", "no-cache, no-store, must-revalidate")
 	ctx.Response.Header.Add("date", time.Now().Format(time.RFC1123))
 	ctx.Response.Header.Add("expires", time.Now().Format(time.RFC1123))
-
-	graph := CreateNPMChart(name, xValues, yValues, width, height)
 
 	graph.Render(chart.SVG, ctx)
 }
