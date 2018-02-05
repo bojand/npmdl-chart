@@ -12,11 +12,11 @@ import (
 	chart "github.com/wcharczuk/go-chart"
 )
 
-const layout = "2006-01-02"
-const ratio float64 = 3.2
+const dateLayout = "2006-01-02"
+const aspectRatio = 3.2
 
-// GetChartDimensions gets the chart dimentions based on the w query param
-func GetChartDimensions(ctx *fasthttp.RequestCtx) (w int, h int, e error) {
+// getChartDimensions gets the chart dimentions based on the w query param
+func getChartDimensions(ctx *fasthttp.RequestCtx) (w int, h int) {
 	width := 800
 	height := 250
 
@@ -38,15 +38,15 @@ func GetChartDimensions(ctx *fasthttp.RequestCtx) (w int, h int, e error) {
 		}
 
 		if !hasH {
-			height = int(float64(width) / ratio)
+			height = int(float64(width) / aspectRatio)
 		}
 	}
 
-	return width, height, nil
+	return width, height
 }
 
-// GetPackageNameAndChartType gets package name and chart type based on name path param
-func GetPackageNameAndChartType(ctx *fasthttp.RequestCtx) (name string, imageType string) {
+// getPackageNameAndChartType gets package name and chart type based on name path param
+func getPackageNameAndChartType(ctx *fasthttp.RequestCtx) (name string, imageType string) {
 	nameParam := strings.ToLower(ctx.UserValue("name").(string))
 	fmt.Println("nameParam: ", nameParam)
 	baseName := filepath.Base(nameParam)
@@ -68,17 +68,12 @@ func GetPackageNameAndChartType(ctx *fasthttp.RequestCtx) (name string, imageTyp
 
 // DrawNPMChart is the handler for the request
 func DrawNPMChart(ctx *fasthttp.RequestCtx) {
-	name, imgType := GetPackageNameAndChartType(ctx)
+	name, imgType := getPackageNameAndChartType(ctx)
+	width, height := getChartDimensions(ctx)
 
 	rangeParam := "last-year"
 	if ctx.QueryArgs().Has("range") {
 		rangeParam = strings.ToLower(string(ctx.QueryArgs().Peek("range")))
-	}
-
-	width, height, err := GetChartDimensions(ctx)
-	if err != nil {
-		ctx.Error(fasthttp.StatusMessage(fasthttp.StatusBadRequest), fasthttp.StatusBadRequest)
-		return
 	}
 
 	fmt.Printf("name: %s range: %s imgType: %s\n", name, rangeParam, imgType)
@@ -96,7 +91,7 @@ func DrawNPMChart(ctx *fasthttp.RequestCtx) {
 	yValues := make([]float64, n)
 
 	for i, dl := range out.Downloads {
-		xValues[i], _ = time.Parse(layout, dl.Day)
+		xValues[i], _ = time.Parse(dateLayout, dl.Day)
 		yValues[i] = float64(dl.Downloads)
 	}
 
