@@ -7,7 +7,7 @@ import (
 
 func main() {
 	router := fasthttprouter.New()
-	router.GET("/chart/:name", DrawNPMChart)
+	router.GET("/chart/*name", DrawNPMChart)
 
 	fasthttp.ListenAndServe(":8080", router.Handler)
 }

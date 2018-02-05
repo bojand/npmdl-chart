@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -22,12 +23,21 @@ func GetChartDimensions(ctx *fasthttp.RequestCtx) (w int, h int, e error) {
 	if ctx.QueryArgs().Has("w") {
 		wStr := string(ctx.QueryArgs().Peek("w"))
 		w, err := strconv.Atoi(wStr)
-		if err != nil {
-			return 0, 0, err
+		if err == nil && w > 0 {
+			width = w
 		}
 
-		if w > 0 {
-			width = w
+		hasH := ctx.QueryArgs().Has("h")
+
+		if hasH {
+			hStr := string(ctx.QueryArgs().Peek("h"))
+			h, err := strconv.Atoi(hStr)
+			if err == nil && h > 0 {
+				height = h
+			}
+		}
+
+		if !hasH {
 			height = int(float64(width) / ratio)
 		}
 	}
@@ -35,9 +45,30 @@ func GetChartDimensions(ctx *fasthttp.RequestCtx) (w int, h int, e error) {
 	return width, height, nil
 }
 
+// GetPackageNameAndChartType gets package name and chart type based on name path param
+func GetPackageNameAndChartType(ctx *fasthttp.RequestCtx) (name string, imageType string) {
+	nameParam := strings.ToLower(ctx.UserValue("name").(string))
+	fmt.Println("nameParam: ", nameParam)
+	baseName := filepath.Base(nameParam)
+	fmt.Println("baseName: ", baseName)
+	ext := filepath.Ext(baseName)
+	fmt.Println("ext: ", ext)
+	if ext == "" {
+		return baseName, "svg"
+	}
+
+	imgType := strings.TrimPrefix(ext, ".")
+	if imgType != "svg" && imgType != "png" {
+		imgType = "svg"
+	}
+
+	pkg := strings.TrimSuffix(baseName, ext)
+	return pkg, imgType
+}
+
 // DrawNPMChart is the handler for the request
 func DrawNPMChart(ctx *fasthttp.RequestCtx) {
-	name := strings.ToLower(ctx.UserValue("name").(string))
+	name, imgType := GetPackageNameAndChartType(ctx)
 
 	rangeParam := "last-year"
 	if ctx.QueryArgs().Has("range") {
@@ -50,7 +81,7 @@ func DrawNPMChart(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	fmt.Printf("name: %s range: %s\n", name, rangeParam)
+	fmt.Printf("name: %s range: %s imgType: %s\n", name, rangeParam, imgType)
 
 	out, err := npmdl.GetRangeCounts(rangeParam, name)
 	if err != nil {
@@ -71,10 +102,15 @@ func DrawNPMChart(ctx *fasthttp.RequestCtx) {
 
 	graph := CreateNPMChart(name, xValues, yValues, width, height)
 
-	ctx.Response.Header.Add("content-type", "image/svg+xml;charset=utf-8")
 	ctx.Response.Header.Add("cache-control", "no-cache, no-store, must-revalidate")
 	ctx.Response.Header.Add("date", time.Now().Format(time.RFC1123))
 	ctx.Response.Header.Add("expires", time.Now().Format(time.RFC1123))
 
-	graph.Render(chart.SVG, ctx)
+	if imgType == "png" {
+		ctx.Response.Header.Add("content-type", "image/png")
+		graph.Render(chart.PNG, ctx)
+	} else {
+		ctx.Response.Header.Add("content-type", "image/svg+xml;charset=utf-8")
+		graph.Render(chart.SVG, ctx)
+	}
 }

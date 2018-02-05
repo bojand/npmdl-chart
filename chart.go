@@ -22,7 +22,7 @@ func CreateNPMChart(
 		Width:  width,
 		Height: height,
 		XAxis: chart.XAxis{
-			// Name:      "Time",
+			Name:      "Time",
 			NameStyle: chart.StyleShow(),
 			Style: chart.Style{
 				Show:        true,
@@ -36,7 +36,7 @@ func CreateNPMChart(
 			},
 		},
 		YAxis: chart.YAxis{
-			// Name:      "Downloads",
+			Name:      "Downloads",
 			NameStyle: chart.StyleShow(),
 			Style: chart.Style{
 				Show:        true,
