@@ -55,8 +55,8 @@
     <div class="chart-section">
         <div class="container">
             <p>Download counts for {{ .Name }}</p>
-            <img src="/chart/{{ .Name }}"
-alt="Please try again in a few minutes. This might not work for very famous repository.">
+            <img src="{{ .ChartURL }}"
+alt="Fetching data and rendering the chart.">
         </div>
     </div>
     {{ end }}

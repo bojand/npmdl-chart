@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	chart "github.com/wcharczuk/go-chart"
@@ -15,8 +14,6 @@ func CreateNPMChart(
 	yValues []float64,
 	width int,
 	height int) *chart.Chart {
-
-	fmt.Println("width: ", width, " height: ", height)
 
 	graph := chart.Chart{
 		Width:  width,

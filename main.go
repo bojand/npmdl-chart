@@ -4,10 +4,12 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 )
 
 func main() {
 	router := chi.NewRouter()
+	router.Use(middleware.Logger)
 	router.Get("/", Index)
 	router.Get("/chart/*", DrawNPMChart)
 	router.Get("/{name}", GetNPMChart)
