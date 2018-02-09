@@ -3,46 +3,49 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
 	npmdl "github.com/bojand/go-npmdl"
-	"github.com/valyala/fasthttp"
+	"github.com/go-chi/chi"
 	chart "github.com/wcharczuk/go-chart"
 )
 
 const dateLayout = "2006-01-02"
 const aspectRatio = 3.2
 
+// TemplateData is used for filling the HTML template
 type TemplateData struct {
 	Name string
 }
 
 // getChartDimensions gets the chart dimentions based on the w query param
-func getChartDimensions(ctx *fasthttp.RequestCtx) (w int, h int) {
+func getChartDimensions(req *http.Request) (w int, h int) {
 	width := 800
 	height := 250
 
-	if ctx.QueryArgs().Has("w") {
-		wStr := string(ctx.QueryArgs().Peek("w"))
+	wStr := req.URL.Query().Get("w")
+
+	if wStr != "" {
 		w, err := strconv.Atoi(wStr)
 		if err == nil && w > 0 {
 			width = w
 		}
 
-		hasH := ctx.QueryArgs().Has("h")
+		hStr := req.URL.Query().Get("h")
 
-		if hasH {
-			hStr := string(ctx.QueryArgs().Peek("h"))
+		if hStr != "" {
 			h, err := strconv.Atoi(hStr)
 			if err == nil && h > 0 {
 				height = h
 			}
 		}
 
-		if !hasH {
+		if hStr == "" {
 			height = int(float64(width) / aspectRatio)
 		}
 	}
@@ -51,8 +54,8 @@ func getChartDimensions(ctx *fasthttp.RequestCtx) (w int, h int) {
 }
 
 // getPackageNameAndChartType gets package name and chart type based on name path param
-func getPackageNameAndChartType(ctx *fasthttp.RequestCtx) (name string, imageType string) {
-	nameParam := strings.ToLower(ctx.UserValue("name").(string))
+func getPackageNameAndChartType(req *http.Request) (name string, imageType string) {
+	nameParam := strings.ToLower(chi.URLParam(req, "*"))
 	fmt.Println("nameParam: ", nameParam)
 	baseName := filepath.Base(nameParam)
 	fmt.Println("baseName: ", baseName)
@@ -72,20 +75,20 @@ func getPackageNameAndChartType(ctx *fasthttp.RequestCtx) (name string, imageTyp
 }
 
 // DrawNPMChart is the handler for the request
-func DrawNPMChart(ctx *fasthttp.RequestCtx) {
-	name, imgType := getPackageNameAndChartType(ctx)
-	width, height := getChartDimensions(ctx)
+func DrawNPMChart(res http.ResponseWriter, req *http.Request) {
+	name, imgType := getPackageNameAndChartType(req)
+	width, height := getChartDimensions(req)
 
-	rangeParam := "last-year"
-	if ctx.QueryArgs().Has("range") {
-		rangeParam = strings.ToLower(string(ctx.QueryArgs().Peek("range")))
+	rangeParam := req.URL.Query().Get("range")
+	if rangeParam == "" {
+		rangeParam = "last-year"
 	}
 
 	fmt.Printf("name: %s range: %s imgType: %s\n", name, rangeParam, imgType)
 
 	out, err := npmdl.GetRangeCounts(rangeParam, name)
 	if err != nil {
-		ctx.Error(fasthttp.StatusMessage(fasthttp.StatusBadRequest), fasthttp.StatusBadRequest)
+		http.Error(res, http.StatusText(400), 400)
 		return
 	}
 
@@ -102,28 +105,51 @@ func DrawNPMChart(ctx *fasthttp.RequestCtx) {
 
 	graph := CreateNPMChart(name, xValues, yValues, width, height)
 
-	ctx.Response.Header.Add("cache-control", "no-cache, no-store, must-revalidate")
-	ctx.Response.Header.Add("date", time.Now().Format(time.RFC1123))
-	ctx.Response.Header.Add("expires", time.Now().Format(time.RFC1123))
+	res.Header().Set("cache-control", "no-cache, no-store, must-revalidate")
+	res.Header().Set("date", time.Now().Format(time.RFC1123))
+	res.Header().Set("expires", time.Now().Format(time.RFC1123))
 
 	if imgType == "png" {
-		ctx.Response.Header.Add("content-type", "image/png")
-		graph.Render(chart.PNG, ctx)
+		res.Header().Set("content-type", "image/png")
+		graph.Render(chart.PNG, res)
 	} else {
-		ctx.Response.Header.Add("content-type", "image/svg+xml;charset=utf-8")
-		graph.Render(chart.SVG, ctx)
+		res.Header().Set("content-type", "image/svg+xml;charset=utf-8")
+		graph.Render(chart.SVG, res)
 	}
 }
 
 // Index serves index.html
-func Index(ctx *fasthttp.RequestCtx) {
-	ctx.SetContentType("text/html; charset=utf-8")
-	template.Must(template.ParseFiles("templates/index.html")).Execute(ctx, nil)
+func Index(res http.ResponseWriter, r *http.Request) {
+	res.Header().Set("content-type", "text/html; charset=utf-8")
+	template.Must(template.ParseFiles("templates/index.html")).Execute(res, nil)
 }
 
-func GetNPMChart(ctx *fasthttp.RequestCtx) {
-	name := strings.ToLower(ctx.UserValue("name").(string))
+// GetNPMChart gets the page with the chart
+func GetNPMChart(res http.ResponseWriter, r *http.Request) {
+	name := strings.ToLower(chi.URLParam(r, "name"))
 	data := TemplateData{Name: name}
-	ctx.SetContentType("text/html; charset=utf-8")
-	template.Must(template.ParseFiles("templates/index.html")).Execute(ctx, data)
+	res.Header().Set("content-type", "text/html; charset=utf-8")
+	template.Must(template.ParseFiles("templates/index.html")).Execute(res, data)
+}
+
+// FileServer for serving files
+func FileServer(r chi.Router, path string, fsPath string) {
+	if strings.ContainsAny(path, "{}*") {
+		panic("FileServer does not permit URL parameters.")
+	}
+
+	workDir, _ := os.Getwd()
+	filesDir := filepath.Join(workDir, fsPath)
+
+	fs := http.StripPrefix(path, http.FileServer(http.Dir(filesDir)))
+
+	if path != "/" && path[len(path)-1] != '/' {
+		r.Get(path, http.RedirectHandler(path+"/", 301).ServeHTTP)
+		path += "/"
+	}
+	path += "*"
+
+	r.Get(path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fs.ServeHTTP(w, r)
+	}))
 }

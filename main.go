@@ -1,16 +1,17 @@
 package main
 
 import (
-	"github.com/buaazp/fasthttprouter"
-	"github.com/valyala/fasthttp"
+	"net/http"
+
+	"github.com/go-chi/chi"
 )
 
 func main() {
-	router := fasthttprouter.New()
-	router.GET("/", Index)
-	router.GET("/chart/*name", DrawNPMChart)
-	// router.GET("/:name", GetNPMChart)
-	router.ServeFiles("/static/*filepath", "static")
+	router := chi.NewRouter()
+	router.Get("/", Index)
+	router.Get("/chart/*", DrawNPMChart)
+	router.Get("/{name}", GetNPMChart)
+	FileServer(router, "/static", "static")
 
-	fasthttp.ListenAndServe(":8080", router.Handler)
+	http.ListenAndServe(":8080", router)
 }

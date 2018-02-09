@@ -14,10 +14,10 @@
   revision = "2eb113592fbdfc70e1999f7e63280f05fe519ef4"
 
 [[projects]]
-  name = "github.com/buaazp/fasthttprouter"
+  name = "github.com/go-chi/chi"
   packages = ["."]
-  revision = "ade4e2031af3aed7fffd241084aad80a58faf421"
-  version = "v0.1.1"
+  revision = "e83ac2304db3c50cf03d96a2fcd39009d458bc35"
+  version = "v3.3.2"
 
 [[projects]]
   branch = "master"
@@ -27,37 +27,6 @@
     "truetype"
   ]
   revision = "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4"
-
-[[projects]]
-  name = "github.com/klauspost/compress"
-  packages = [
-    "flate",
-    "gzip",
-    "zlib"
-  ]
-  revision = "6c8db69c4b49dd4df1fff66996cf556176d0b9bf"
-  version = "v1.2.1"
-
-[[projects]]
-  name = "github.com/klauspost/cpuid"
-  packages = ["."]
-  revision = "ae7887de9fa5d2db4eaa8174a7eff2c1ac00f2da"
-  version = "v1.1"
-
-[[projects]]
-  name = "github.com/klauspost/crc32"
-  packages = ["."]
-  revision = "cb6bfca970f6908083f26f39a79009d608efd5cd"
-  version = "v1.1"
-
-[[projects]]
-  name = "github.com/valyala/fasthttp"
-  packages = [
-    ".",
-    "fasthttputil"
-  ]
-  revision = "d42167fd04f636e20b005e9934159e95454233c7"
-  version = "v20160617"
 
 [[projects]]
   name = "github.com/wcharczuk/go-chart"
@@ -82,6 +51,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2b3a2e5b7debac0ab1e39926c2e33d8557c8811e5a8c8ece299c45649042554d"
+  inputs-digest = "f0b8b271dc58aa6c8a718a45c9b2d403ca074ebd864c0bb60b118ff051e187f1"
   solver-name = "gps-cdcl"
   solver-version = 1
