@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -14,6 +15,10 @@ import (
 
 const dateLayout = "2006-01-02"
 const aspectRatio = 3.2
+
+type TemplateData struct {
+	Name string
+}
 
 // getChartDimensions gets the chart dimentions based on the w query param
 func getChartDimensions(ctx *fasthttp.RequestCtx) (w int, h int) {
@@ -108,4 +113,17 @@ func DrawNPMChart(ctx *fasthttp.RequestCtx) {
 		ctx.Response.Header.Add("content-type", "image/svg+xml;charset=utf-8")
 		graph.Render(chart.SVG, ctx)
 	}
+}
+
+// Index serves index.html
+func Index(ctx *fasthttp.RequestCtx) {
+	ctx.SetContentType("text/html; charset=utf-8")
+	template.Must(template.ParseFiles("templates/index.html")).Execute(ctx, nil)
+}
+
+func GetNPMChart(ctx *fasthttp.RequestCtx) {
+	name := strings.ToLower(ctx.UserValue("name").(string))
+	data := TemplateData{Name: name}
+	ctx.SetContentType("text/html; charset=utf-8")
+	template.Must(template.ParseFiles("templates/index.html")).Execute(ctx, data)
 }

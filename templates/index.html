@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8">
+    <title>NPM Download Counts Chart</title>
+    <meta name="description" content="NPM Download Counts Chart">
+    <meta name="author" content="https://github/bojand">
+
+    <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link href='http://fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+
+    <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+    <link rel="stylesheet" href="/static/normalize.css">
+
+    <style>
+        /* body {
+            padding-top: 80px;
+        } */
+
+        .section {
+            padding: 8rem 0 7rem;
+            text-align: center;
+        }
+
+        .section-heading,
+        .section-description {
+            margin-bottom: 1.2rem;
+        }
+    </style>
+
+    <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="icon" type="image/png" href="/static/npm-favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/static/npm-favicon-16x16.png" sizes="16x16" />
+
+</head>
+
+<body>
+    <div class="section">
+        <div class="container">
+            <h5 class="section-heading"><strong>NPM Download Couts Chart</strong></h5>
+            <p class="section-description">Skeleton is an amazingly easy place to start with responsive development. If you want to learn more, just visit the documentation!</p>
+            <a class="button button-primary" href="http://getskeleton.com">View Skeleton Docs</a>
+        </div>
+    </div>
+    {{ if .Name }}
+    <div class="section">
+        <div class="container">
+            <p class="section-description">Chart content goes here for params: {{ .Name }}</p>
+        </div>
+    </div>
+</body>
+
+</html>
