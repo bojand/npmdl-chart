@@ -34,8 +34,6 @@ func DrawNPMChart(res http.ResponseWriter, req *http.Request) {
 		rangeParam = "last-year"
 	}
 
-	// fmt.Printf("name: %s range: %s imgType: %s\n", name, rangeParam, imgType)
-
 	out, err := npmdl.GetRangeCounts(rangeParam, name)
 	if err != nil {
 		http.Error(res, http.StatusText(400), 400)
