@@ -57,12 +57,10 @@ func getChartDimensions(req *http.Request) (w int, h int) {
 func getPackageNameAndChartType(req *http.Request) (name string, imageType string) {
 	nameParam := strings.ToLower(chi.URLParam(req, "*"))
 	fmt.Println("nameParam: ", nameParam)
-	baseName := filepath.Base(nameParam)
-	fmt.Println("baseName: ", baseName)
-	ext := filepath.Ext(baseName)
+	ext := filepath.Ext(nameParam)
 	fmt.Println("ext: ", ext)
 	if ext == "" {
-		return baseName, "svg"
+		return nameParam, "svg"
 	}
 
 	imgType := strings.TrimPrefix(ext, ".")
@@ -70,7 +68,7 @@ func getPackageNameAndChartType(req *http.Request) (name string, imageType strin
 		imgType = "svg"
 	}
 
-	pkg := strings.TrimSuffix(baseName, ext)
+	pkg := strings.TrimSuffix(nameParam, ext)
 	return pkg, imgType
 }
 
@@ -127,6 +125,10 @@ func Index(res http.ResponseWriter, r *http.Request) {
 // GetNPMChart gets the page with the chart
 func GetNPMChart(res http.ResponseWriter, r *http.Request) {
 	name := strings.ToLower(chi.URLParam(r, "name"))
+	rest := strings.ToLower(chi.URLParam(r, "*"))
+	if rest != "" {
+		name = name + "/" + rest
+	}
 	data := TemplateData{Name: name}
 	res.Header().Set("content-type", "text/html; charset=utf-8")
 	template.Must(template.ParseFiles("templates/index.html")).Execute(res, data)
