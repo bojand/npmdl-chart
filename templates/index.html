@@ -16,7 +16,7 @@
 </head>
 
 <body>
-        <a href="https://www.github.com/bojand/npmdl-chart"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+    <a href="https://www.github.com/bojand/npmdl-chart"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
     <div class="section-header">
         <div class="container">
             <h5><strong><a style="color: inherit; text-decoration: inherit;" href="/">NPM Downloads Chart</a></strong></h5>
@@ -43,8 +43,7 @@
                 Chart <a href="https://www.npmjs.com">NPM</a> package download counts by browsing to <code>/name</code>
                 <br/>For example <a href="https://www.npmjs.com/package/express">Express</a> downloads for <b>last year</b> at <a href="/express">/express</a>
                 <br/>For a different range try <a href="/lodash?range=last-month">/lodash?range=last-month</a>
-                <br/>Or a specific range like <a href="/async?range=2018-01-01:2019-02-01">/async?range=2018-01-01:2019-02-01</a>
-                <br/>See <a href="https://github.com/npm/download-counts">NPM Download Counts API</a>
+                <br/>Or a specific range like <a href="/async?range=2018-01-01:2018-02-01">/async?range=2018-01-01:2019-02-01</a>
             </p>
         </div>
     </div>
@@ -52,9 +51,41 @@
         <div class="container">
             <hr>
             <h5><strong>Chart API</strong></h5>
+            <p>
+                <code>/chart/{name}[.svg|.png]</code>
+            </p>
+            <p>
+                The chart API can be used to directly generate the download counts chart image and embed it.
+                <br/>The image extension is optional and can be used to control the image format.
+                <br/>By default if omitted a SVG chart image is rendered.
+            </p>
+            <p>
+                <b>Query parameters</b>
+                <ul>
+                    <li><code>range</code> - the range parameter to query. See <a href="https://github.com/npm/download-counts">NPM download counts API documentation</a>.</li>
+                    <li><code>w</code> - the width of the image.</li>
+                    <li><code>h</code> - the height of the image. If none provided the default aspect ratio is kept.</li>
+                </ul>
+            </p>
+            <p>
+                <b>Examples</b>
+            </p>
+            <p>
+                <ul>
+                    <li><a href="/chart/express">/chart/express</a> - Default SVG image</li>
+                    <li><a href="/chart/express.svg">/chart/express.svg</a> - Optionally include image format extension explicetly</li>
+                    <li><a href="/chart/express.png">/chart/express.png</a> - PNG render with all other settings being default</li>
+                    <li><a href="/chart/express?range=last-month">/chart/express?range=last-month</a> - Specific range</li>
+                    <li><a href="/chart/express?range=last-month&w=600">/chart/express?range=last-month&w=600</a> - Specific range and width</li>
+                    <li><a href="/chart/express?range=2017-01-01:2017-11-01&w=600&h=300">/chart/express?range=2017-01-01:2017-11-01&w=600&h=300</a> - Specific range and dimensions</li>
+                    <li><a href="/chart/express.png?range=2017-01-01:2017-11-01&w=400&h=200">/chart/express?range=2017-01-01:2017-11-01&w=600&h=300</a> - Render PNG and explicitly set all options</li>
+                </ul>
+            </p>
         </div>
     </div>
     {{ end }}
+    <div class="section-footer">
+    </div>
 </body>
 
 </html>

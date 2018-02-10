@@ -2,12 +2,18 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 )
 
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Get("/", Index)
@@ -16,5 +22,5 @@ func main() {
 	router.Get("/{name}/*", GetNPMChart)
 	FileServer(router, "/static", "static")
 
-	http.ListenAndServe(":8080", router)
+	http.ListenAndServe(":"+port, router)
 }
