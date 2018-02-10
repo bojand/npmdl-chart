@@ -16,7 +16,7 @@ Example chart:
 
 ## Why?
 
-Yes this could be built with just [frontend JavaScript](https://npm-stat.com/).
+Yes this could be built with just frontend JavaScript.
 
 Just experimenting with [Go](https://golang.org/).
 
