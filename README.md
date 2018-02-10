@@ -8,7 +8,9 @@ Plot NPM download counts over time
 go run *.go
 ```
 
-Then browse http://localhost:8080 or http://localhost:8080/express
+Then browse http://localhost:8080
+
+or http://localhost:8080/express
 
 Example chart:
 
