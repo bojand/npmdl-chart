@@ -116,7 +116,7 @@ func FileServer(r chi.Router, path string, fsPath string) {
 
 // Utils
 
-// getChartDimensions gets the chart dimentions based on the w query param
+// getChartDimensions gets the chart dimensions based on the w query param
 func getChartDimensions(req *http.Request) (w int, h int) {
 	width := 800
 	height := 250
