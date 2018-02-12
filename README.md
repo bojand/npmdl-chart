@@ -5,6 +5,7 @@ Plot NPM download counts over time
 ## Usage
 
 ```
+dep ensure
 go run *.go
 ```
 
