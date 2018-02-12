@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/bojand/npmdl-chart)](https://goreportcard.com/report/github.com/bojand/npmdl-chart)
+
 # npmdl
 
 Plot NPM download counts over time 
