@@ -15,7 +15,7 @@ Then browse to http://localhost:8080 or http://localhost:8080/express
 
 Example chart:
 
-[![Express downloads over time](http://npmdl.herokuapp.com/chart/express)](http://npmdl.herokuapp.com/chart/express)
+[![Express downloads over time](http://npmdl.bojan.codes/chart/express.svg)](https://npmdl.bojan.codes/chart/express)
 
 ## Why?
 
